@@ -1,0 +1,175 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct no{
+	int conteudo;
+	struct no *esquerda, *direita;
+}Arvore;
+
+Arvore* Inserir(Arvore *raiz, int num){
+	
+	if(raiz==NULL){
+		Arvore *aux=(Arvore*)malloc(sizeof(Arvore));
+		aux->conteudo=num;
+		aux->esquerda=NULL;
+		aux->direita=NULL;
+		return aux;
+	}
+	else{
+	
+	if(num<raiz->conteudo)
+		raiz->esquerda=Inserir(raiz->esquerda,num);
+		else
+		raiz->direita=Inserir(raiz->direita,num);
+		return raiz;
+	}	
+}
+
+void Imprimir1(Arvore *raiz){
+
+if(raiz){
+	printf("-%d-",raiz->conteudo);
+	Imprimir1(raiz->esquerda);
+	Imprimir1(raiz->direita);
+}
+}
+
+void Imprimir2(Arvore *raiz){
+if(raiz){
+	Imprimir2(raiz->esquerda);
+	printf("-%d-",raiz->conteudo);
+	Imprimir2(raiz->direita);
+}
+}
+Arvore* remover(Arvore *raiz,int procura){
+	Arvore *auxi=(Arvore*)malloc(sizeof(Arvore));
+	
+	if(raiz->conteudo==procura){
+		if(raiz->esquerda==NULL && raiz->direita==NULL){
+			free(raiz);
+			return NULL;
+		}else
+	    if (raiz->esquerda != NULL && raiz->direita != NULL){
+		
+	      auxi=raiz->esquerda;
+	      while (auxi->direita!=NULL)
+	       auxi=auxi->direita;
+	      raiz->conteudo=auxi->conteudo;
+	      auxi->conteudo=procura;
+	      raiz->esquerda=remover(raiz->esquerda,procura);
+	      return raiz;
+		
+		}else{
+			Arvore *aux;
+			if(raiz->esquerda!=NULL)
+			 aux=raiz->esquerda;
+			else
+			  aux=raiz->direita;
+			free(raiz);
+			return aux;
+			
+		}
+	    }else
+		 if(procura<raiz->conteudo){
+		
+			raiz->esquerda = remover(raiz->esquerda, procura);
+		
+		 }else{		
+		    raiz->direita = remover(raiz->direita, procura); 
+		  }
+		    
+	   	return raiz;
+	}
+int quant(Arvore *raiz){
+
+if (raiz==NULL)
+return 0;
+else
+return 1 + quant(raiz->esquerda)+quant(raiz->direita);
+}
+
+int altura(Arvore *raiz){
+	int esq;
+	int dir;
+
+if (raiz==NULL)
+return -1;
+else
+esq = altura(raiz->esquerda);
+dir = altura(raiz->direita);
+if (esq > dir)
+return esq + 1;
+else
+return dir + 1;
+}
+
+int maior(Arvore *raiz){
+	if (raiz==NULL)
+	printf("Vazio...");
+    else
+    while(raiz->direita)	
+    raiz=raiz->direita;
+return raiz->conteudo;
+}
+
+
+	
+int main(){
+
+	
+	Arvore *raiz=NULL;
+	int opcao;
+	int conteudo;
+	int procura;
+	int maioral;
+		
+	do{
+		printf("\n 0-Sair\n 1-Inserir\n 2-Imprimir\n 3-Remover\n 4-Quantidade\n 5-Altura\n 6-Maior\n");
+		scanf("%d",&opcao);
+		
+		switch(opcao){
+		case 1:
+			printf("Digite um valor: ");
+			scanf("%d",&conteudo);
+			raiz=Inserir(raiz,conteudo);
+			break;
+		case 2:
+			printf("IMPRESSO COM SUCESSO!\n");
+			Imprimir1(raiz);
+			printf("\n");
+			Imprimir2(raiz);
+			break;
+		case 3:
+		    printf("Qual valor deseja remover?\n");
+		    scanf("%d",&procura);
+		    remover(raiz,procura);
+		    printf("Valor %d removido com sucesso!!!",procura);	    
+		    break;
+		case 4:
+			printf("Quantidade de nos: %d\n",quant(raiz));
+			break;
+		case 5:
+			printf("Altura: %d\n",altura(raiz));
+			break;
+		case 6:
+			printf("Maior: %d\n",maior(raiz));
+			break;
+		default:
+		if(opcao=!0){
+			printf("OPÇÃO INVÁLIDA...");
+		}
+		}
+		
+	}while(opcao=!0);
+	
+	return 0;
+}
+
+
+
+
+
+
+
+
+
