@@ -1,0 +1,146 @@
+#include <stdio.h>
+#include <stdlib.h>
+typedef struct{
+    char nome[50];
+    int camisa;
+}Jogador;
+
+typedef struct no{
+    Jogador jogador;
+    struct no *direita, *esquerda;
+}Time;
+
+Jogador ler_jogador(){
+    Jogador  jog;
+    printf("\tNome do jogador: ");
+    fgets(jog.nome, 49, stdin);
+    printf("\tNumero Camisa: ");
+    scanf("%d", &jog.camisa);
+    return jog;
+}
+
+void imprimir_jogador(Jogador  jog){
+    printf("Nome: %s Camisa: %d\n", jog.nome, jog.camisa);
+}
+
+
+Time* escalar(Time *raiz, Jogador  jog){
+
+    if(raiz == NULL){
+        Time *aux =(Time*)malloc(sizeof(Time));
+        aux->jogador = jog;
+        aux->esquerda = NULL;
+        aux->direita = NULL;
+        return aux;
+    }
+    else{
+        if(jog.camisa < raiz->jogador.camisa)
+            raiz->esquerda = escalar(raiz->esquerda, jog);
+        else
+            raiz->direita = escalar(raiz->direita, jog);
+        return raiz;
+    }
+
+}
+
+Time* remover(Time *raiz, int chave) {
+    if(raiz == NULL){
+        printf("Valor nao encontrado!\n");
+        return NULL;
+    } else {
+        if(raiz->jogador.camisa == chave) {
+            if(raiz->esquerda == NULL && raiz->direita == NULL) {
+                free(raiz);
+                return NULL;
+            }
+            else{
+                if(raiz->esquerda != NULL && raiz->direita != NULL){
+                    Jogador p;
+                    Time *aux = raiz->esquerda;
+                    while(aux->direita != NULL)
+                        aux = aux->direita;
+                    p = raiz->jogador;
+                    raiz->jogador = aux->jogador;
+                    aux->jogador= p;
+                    raiz->esquerda = remover(raiz->esquerda, chave);
+                    return raiz;
+                }
+                else{
+                    Time *aux;
+                    if(raiz->esquerda != NULL)
+                        aux = raiz->esquerda;
+                    else
+                        aux = raiz->direita;
+                    free(raiz);
+                    return aux;
+                }
+            }
+        } else {
+            if(chave < raiz->jogador.camisa)
+                raiz->esquerda = remover(raiz->esquerda, chave);
+            else
+                raiz->direita = remover(raiz->direita, chave);
+            return raiz;
+        }
+    }
+}
+
+void imprimir_posordem(Time *raiz){ 
+    if(raiz){
+        imprimir_posordem(raiz->esquerda);
+        imprimir_jogador(raiz->jogador);
+        imprimir_posordem(raiz->direita);
+    }
+}
+
+void imprimir_ordem(Time *raiz){
+    if(raiz){
+        imprimir_ordem(raiz->esquerda);
+        imprimir_jogador(raiz->jogador);
+        imprimir_ordem(raiz->direita);
+    }
+}
+
+
+int main(){
+
+    Time *busca, *raiz = NULL;
+    int opcao, valor;
+    do{
+        printf("\n|    0-Sair        |\n");
+        printf("\n|    1-Escalar     |\n");
+        printf("\n|    2-Escalacao   |\n");
+        printf("\n|    3-Substituir  |\n");
+        printf("\n");
+        scanf("%d", &opcao);
+        scanf("%c");
+
+        switch(opcao){
+        case 1:
+            raiz=escalar(raiz, ler_jogador());
+			break;
+        case 2:
+            printf("\nPrimeira impressao:\n");
+            imprimir_posordem(raiz);
+            printf("\n");
+            printf("\nSegunda impressao:\n");
+            imprimir_ordem(raiz);
+            printf("\n");
+            break;
+        case 3:
+            imprimir_ordem(raiz);
+            printf("\n\tJogador a ser Substituido: ");
+            scanf("%d", &valor);
+            raiz = remover(raiz, valor);
+            printf("\nSubstituto: \n");
+            scanf("%c");
+            raiz=escalar(raiz, ler_jogador());
+            break;
+        default:
+            if(opcao != 0)
+                printf("\n\tOpcao invalida!!!\n");
+        }
+    }while(opcao != 0);
+
+    return 0;
+}
